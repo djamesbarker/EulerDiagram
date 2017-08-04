@@ -22,9 +22,9 @@ plt.style.use('ggplot')
 # given R1, R2, and D, what is Beta1 and Beta2 ?
 # given R1, R2, and D what is Aisoc1 and Aisoc2 ?
 #==============================================================================
-R1 = 5
-R2 = 10
-D = 13
+RadSmall = 5
+RadLg = 10
+DistC2C = 4
 
 def Distance_Circle_Center_to_Chord (RadiusBig,RadiusSmall,CCDist):
     """
@@ -133,12 +133,13 @@ def Area_of_Overlap(RadiusBig, RadiusSmall, CCDist):
     AreaOverlap = AreaSmLens + AreaLgLens
     return AreaOverlap
 
-X2 = Distance_Circle_Center_to_Chord(10,5,16)
-Beta_1 = Angle_of_Small_Triangle(10,5,13)
-Aisoc_2 = Area_of_Large_Triangle(10,5,13)
-Beta_2 = Angle_of_Large_Triangle(10,5,13)
-Asector_1 = Area_of_Small_Sector(10,5,13)
-Asector_2 = Area_of_Large_Sector(10,5,13)
-Overlap = Area_of_Overlap(10,5,13)
+if DistC2C>= RadSmall+RadLg:
+    print ("There is no overlap between these circles.")
 
-print(X2)
+elif DistC2C <= RadLg - RadSmall:
+    print ("The smaller circle is completely encircled by the larger circle.")
+
+else:
+    Overlap = Area_of_Overlap(RadLg,RadSmall,DistC2C)
+
+print(Overlap)
