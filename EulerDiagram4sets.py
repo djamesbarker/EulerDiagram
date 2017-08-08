@@ -23,8 +23,9 @@ plt.style.use('ggplot')
 # given R1, R2, and D what is Aisoc1 and Aisoc2 ?
 #==============================================================================
 RadSmall = 5
-RadLg = 10
-DistC2C = 4
+RadLg = 100
+DistC2C = 101
+AreaOverlap = 28.94795433
 
 def Distance_Circle_Center_to_Chord (RadiusBig,RadiusSmall,CCDist):
     """
@@ -35,7 +36,7 @@ def Distance_Circle_Center_to_Chord (RadiusBig,RadiusSmall,CCDist):
     return: CenterChordDistance
     """
     
-    CenterChordDist = (RadiusBig**2 - RadiusSmall**2 - CCDist**2) / (-2*CCDist)
+    CenterChordDist = ( CCDist**2 - RadiusSmall**2 + RadiusBig**2) / (2*CCDist)
     return CenterChordDist
     
 def Half_Chord_Length_Cusp_to_Cusp (RadiusBig,RadiusSmall,CCDist):
@@ -44,7 +45,7 @@ def Half_Chord_Length_Cusp_to_Cusp (RadiusBig,RadiusSmall,CCDist):
     calculate half the cord length of the Chord line
     """
     Xsolved = Distance_Circle_Center_to_Chord(RadiusBig, RadiusSmall, CCDist)    
-    HalfChordLength = math.sqrt( RadiusSmall**2 - Xsolved**2)
+    HalfChordLength = math.sqrt( RadiusBig**2 - Xsolved**2)
     return HalfChordLength
     
 def Area_of_Small_Triangle (RadiusBig,RadiusSmall,CCDist):
@@ -54,7 +55,7 @@ def Area_of_Small_Triangle (RadiusBig,RadiusSmall,CCDist):
     """
     Xsolved = Distance_Circle_Center_to_Chord(RadiusBig, RadiusSmall, CCDist)
     Ysolved = Half_Chord_Length_Cusp_to_Cusp(RadiusBig, RadiusSmall, CCDist)
-    ASmTri = Xsolved * Ysolved
+    ASmTri = Ysolved*(CCDist-Xsolved)
     return ASmTri
     
 def Area_of_Large_Triangle (RadiusBig, RadiusSmall, CCDist):
@@ -64,7 +65,7 @@ def Area_of_Large_Triangle (RadiusBig, RadiusSmall, CCDist):
     """
     Xsolved = Distance_Circle_Center_to_Chord(RadiusBig, RadiusSmall, CCDist)
     Ysolved = Half_Chord_Length_Cusp_to_Cusp(RadiusBig, RadiusSmall, CCDist)
-    ALgTri = Ysolved*(CCDist-Xsolved)
+    ALgTri = Xsolved * Ysolved
     return ALgTri
     
 def Angle_of_Small_Triangle(RadiusBig, RadiusSmall, CCDist):
@@ -73,7 +74,9 @@ def Angle_of_Small_Triangle(RadiusBig, RadiusSmall, CCDist):
     calculate the angle of the triangle from the center point of the small circle to the chord
     """
     Xsolved = Distance_Circle_Center_to_Chord(RadiusBig, RadiusSmall, CCDist)
-    Beta1 = 2*(math.acos(Xsolved/RadiusSmall))
+    X2 = CCDist - Xsolved
+    ratio = X2/RadiusSmall
+    Beta1 = 2*(math.acos(ratio))
     return Beta1
     
 def Angle_of_Large_Triangle(RadiusBig, RadiusSmall, CCDist):
@@ -82,7 +85,7 @@ def Angle_of_Large_Triangle(RadiusBig, RadiusSmall, CCDist):
     calculate the angle of the triangle from the center point of the large circle to the chord
     """
     Xsolved = Distance_Circle_Center_to_Chord(RadiusBig, RadiusSmall, CCDist)
-    Beta2 = 2*(math.acos((CCDist-Xsolved)/RadiusBig))
+    Beta2 = 2*(math.acos(Xsolved/RadiusBig))
     return Beta2
     
 def Area_of_Small_Sector (RadiusBig, RadiusSmall, CCDist):
@@ -133,13 +136,59 @@ def Area_of_Overlap(RadiusBig, RadiusSmall, CCDist):
     AreaOverlap = AreaSmLens + AreaLgLens
     return AreaOverlap
 
+def Calculate_Distance_for_Given_Overlap(RadiusBig,RadiusSmall,AOverlap):
+    """
+    guesses a default center to center distance and calculates the area of overlap given that distance
+    then compares the calculated area to the desired area of overlap, and adjusts the distance accordingly
+    """
+    Tolerance = 0.0001
+    Dmin = RadiusBig - RadiusSmall
+    Dmax = RadiusBig + RadiusSmall
+    if AOverlap <= 0:
+        print ("There is no overlap between these circles.")
+        Dguess = -1
+    elif AOverlap >= math.pi*RadiusSmall**2:
+        print("The smaller circle is completely encircled by the larger circle.")
+        Dguess = 0
+    else:
+        Dguess = (Dmax+Dmin)/2
+        print ('Dguess',Dguess)
+        AOCalc = Area_of_Overlap(RadiusBig,RadiusSmall,Dguess)
+        print('AoCalc',AOCalc)
+        errorVal = AOverlap - AOCalc
+        print('errorVal',errorVal)
+        loopCounter = 0
+        
+        while (abs(errorVal)) > Tolerance:
+            loopCounter +=1
+            #adjust distance
+            if errorVal > 0:
+                Dmax = Dguess
+                Dguess = (Dguess+Dmin)/2
+                print('new Dmax = ',Dmax, 'new Dguess =',Dguess)
+                AOCalc = Area_of_Overlap(RadiusBig,RadiusSmall,Dguess)
+                print('AoCalc',AOCalc)
+                errorVal = AOverlap - AOCalc
+                print('errorVal',errorVal)
+            elif errorVal < 0:
+                Dmin = Dguess
+                Dguess = (Dmax+Dguess)/2
+                print('new Dmin = ',Dmin, 'new Dguess =',Dguess)
+                AOCalc = Area_of_Overlap(RadiusBig,RadiusSmall,Dguess)
+                print('AoCalc',AOCalc)
+                errorVal = AOverlap - AOCalc
+                print('errorVal',errorVal)
+            else:
+                return Dguess
+    return Dguess
+
 if DistC2C>= RadSmall+RadLg:
     print ("There is no overlap between these circles.")
 
 elif DistC2C <= RadLg - RadSmall:
-    print ("The smaller circle is completely encircled by the larger circle.")
-
+    print ("The smaller circle is completely encircled by the larger circle. Overlap = ", math.pi*RadSmall**2)
 else:
     Overlap = Area_of_Overlap(RadLg,RadSmall,DistC2C)
+    CalcDistC2C = Calculate_Distance_for_Given_Overlap(RadLg,RadSmall,AreaOverlap)
 
-print(Overlap)
+print(Overlap, CalcDistC2C)
