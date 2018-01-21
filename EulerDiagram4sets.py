@@ -14,9 +14,15 @@ import sys
 import statsmodels.api as sm
 import statsmodels.formula.api as smf
 import matplotlib.pyplot as plt
+from matplotlib.patches import Circle
+from matplotlib.collections import PatchCollection
+import plotly
 import plotly.plotly as py
+plotly.tools.set_credentials_file(username='kleblanc5909', api_key='MIzFQggygCgieJcytNTR')
 import plotly.graph_objs as go
 plt.style.use('ggplot')
+dataFolder = "/Users/leblanckh/data"
+os.chdir(dataFolder)
 
 #==============================================================================
 # make a whole library of small modular functions
@@ -24,8 +30,14 @@ plt.style.use('ggplot')
 # given R1, R2, and D, what is Beta1 and Beta2 ?
 # given R1, R2, and D what is Aisoc1 and Aisoc2 ?
 #==============================================================================
-Radii = [1.261566,1.784124,2.931615,2.185097]
-AreaOverlap = {'AO01':2,'AO12':2,'AO23':14, 'AO03':0}
+#Radii = [1.381976597885342,1.784124,2.185096861184158,2.111004122822376]
+#AreaOverlap = {'AO01':1,'AO12':0,'AO23':7, 'AO03':2}
+#CircleNames = ['Consumption \nIncrease,6', 'Approach \nIncrease,10', 'Consumption \nDecrease,15', 'Approach \nDecrease,14', 'No Response,15']
+
+#reorder - 1 to 0, 0 to 1, 3 to 2, 2 to 3
+Radii = [1.381976597885342,1.784124,2.185096861184158,2.111004122822376]
+AreaOverlap = {'AO01':1,'AO12':0,'AO23':7, 'AO03':2}
+CircleNames = ['Consumption \nIncrease,6', 'Approach \nIncrease,10', 'Consumption \nDecrease,15', 'Approach \nDecrease,14', 'No Response,15']
 
 def Distance_Circle_Center_to_Chord (RadiusBig,RadiusSmall,CCDist):
     """
@@ -321,16 +333,19 @@ for aKey in OverlapKeys:
             print ("The number of radii overlapping is too large... ", numOverlap)
             
 Dist01 = Calculate_Distance_for_Given_Overlap(Radii[1], Radii[0], AreaOverlap['AO01'])
-Dist12 = Calculate_Distance_for_Given_Overlap(Radii[2], Radii[1], AreaOverlap['AO12'])
+#Dist12 = Calculate_Distance_for_Given_Overlap(Radii[2], Radii[1], AreaOverlap['AO12'])
 Dist23 = Calculate_Distance_for_Given_Overlap(Radii[2], Radii[3], AreaOverlap['AO23'])
+Dist03 = Calculate_Distance_for_Given_Overlap(Radii[3], Radii[0], AreaOverlap['AO03'])
 print (DistanceAO)
 print (Dist01)
-print (Dist12)
+#print (Dist12)
 print (Dist23)
+print (Dist03)
 
 angle01 = math.pi/4
-angle12 = math.pi * 2/3
-angle23 = math.pi * 7/6
+#angle12 = math.pi * 2/3
+angle23 = math.pi * 3/2
+angle03 = math.pi * 2/3
 
 theBearings = {'AO01':angle01, 'AO12':angle12, 'AO23':angle23}
 #now get the corners
@@ -338,15 +353,43 @@ allCenterXs,allCenterYs,allCornersDataSet01 = find_All_Corners_in_Order_single_O
 
 print("Final answer:  ", allCenterXs, allCenterYs, allCornersDataSet01)
 
+fig, ax = plt.subplots()
+plt.axes()
+
+circle1 = plt.Circle((allCenterXs[0],allCenterYs[0]),radius = Radii[0], color = 'g', alpha = .3)
+circle2 = plt.Circle((allCenterXs[1],allCenterYs[1]),radius = Radii[1], color = 'b', alpha = .3)
+circle3 = plt.Circle((allCenterXs[2],allCenterYs[2]),radius = Radii[2], color = 'r', alpha = .3)
+circle4 = plt.Circle((allCenterXs[3],allCenterYs[3]),radius = Radii[3], color = 'y', alpha = .3)
+circle5 = plt.Circle((5,2),radius = 2.185096861184158, color = 'k', alpha = .3)
+plt.gca().add_patch(circle1)
+plt.gca().add_patch(circle2)
+plt.gca().add_patch(circle3)
+plt.gca().add_patch(circle4)
+plt.gca().add_patch(circle5)
+
+plt.text(allCenterXs[0], 1,CircleNames[0], horizontalalignment='center', verticalalignment='center',multialignment='center')
+plt.text(allCenterXs[1], 3,CircleNames[1], horizontalalignment='center', verticalalignment='center',multialignment='center')
+plt.text(6, 2.5,CircleNames[2], horizontalalignment='center', verticalalignment='center',multialignment='center')
+plt.text(8.5, -2,CircleNames[3], horizontalalignment='center', verticalalignment='center',multialignment='center')
+plt.text(1.5, -2,CircleNames[4], horizontalalignment='center', verticalalignment='center')
+plt.text(1.6,1.7, AreaOverlap['AO01'], color = 'red')
+plt.text(4,1.7, AreaOverlap['AO12'], color = 'red')
+plt.text(allCenterXs[3], allCenterYs[3], AreaOverlap['AO23'], color = 'red')
+
+
+plt.axis('scaled')
+plt.savefig('ConsumptionApproach2.svg',format = "svg", transparent = True)
+
+
 #trace0 = go.Scatter(
 #    x = allCenterXs,
 #    y= allCenterYs,
-#    text=['$A$', '$A+B$', '$B$'],
+#    text=['$Consumption Increase$', '$Approach Increase$','$Consumption Decrease$','$Approach Decrease$'],
 #    mode='text',
 #    textfont=dict(
 #        color='black',
 #        size=18,
-#        family='Arail',
+#        family='Arial',
 #    )
 #)
 #
@@ -370,44 +413,72 @@ print("Final answer:  ", allCenterXs, allCenterYs, allCornersDataSet01)
 #            'opacity': 0.3,
 #            'xref': 'x',
 #            'yref': 'y',
-#            'fillcolor': 'blue',
-#            'x0': 0,
-#            'y0': 0,
-#            'x1': 2,
-#            'y1': 2,
+#            'fillcolor': 'brown',
+#            'x0': allCornersDataSet01[0][0][0],
+#            'y0': allCornersDataSet01[0][0][1],
+#            'x1': allCornersDataSet01[0][1][0],
+#            'y1': allCornersDataSet01[0][1][1],
 #            'type': 'circle',
 #            'line': {
-#                'color': 'blue',
+#                'color': 'brown',
 #            },
 #        },
 #        {
 #            'opacity': 0.3,
 #            'xref': 'x',
 #            'yref': 'y',
-#            'fillcolor': 'gray',
-#            'x0': 1.5,
-#            'y0': 0,
-#            'x1': 3.5,
-#            'y1': 2,
+#            'fillcolor': 'green',
+#            'x0': allCornersDataSet01[1][0][0],
+#            'y0': allCornersDataSet01[1][0][1],
+#            'x1': allCornersDataSet01[1][1][0],
+#            'y1': allCornersDataSet01[1][1][1],
 #            'type': 'circle',
 #            'line': {
-#                'color': 'gray',
+#                'color': 'green',
 #            },
-#        }
+#        },
+#        {
+#            'opacity': 0.3,
+#            'xref': 'x',
+#            'yref': 'y',
+#            'fillcolor': 'brown',
+#            'x0': allCornersDataSet01[2][0][0],
+#            'y0': allCornersDataSet01[2][0][1],
+#            'x1': allCornersDataSet01[2][1][0],
+#            'y1': allCornersDataSet01[2][1][1],
+#            'type': 'circle',
+#            'line': {
+#                'color': 'brown',
+#            },
+#        },
+#        {
+#            'opacity': 0.3,
+#            'xref': 'x',
+#            'yref': 'y',
+#            'fillcolor': 'green',
+#            'x0': allCornersDataSet01[3][0][0],
+#            'y0': allCornersDataSet01[3][0][1],
+#            'x1': allCornersDataSet01[3][1][0],
+#            'y1': allCornersDataSet01[3][1][1],
+#            'type': 'circle',
+#            'line': {
+#                'color': 'green',
+#            },
+#        },
 #    ],
 #    'margin': {
 #        'l': 20,
 #        'r': 20,
 #        'b': 100
 #    },
-#    'height': 600,
+#    'height': 800,
 #    'width': 800,
 #}
 #fig = {
 #    'data': data,
 #    'layout': layout,
 #}
-#py.iplot(fig, filename='venn-diagram')
+#py.plot(fig, filename='EulerDiagram_ConsumptionApproach')
             
 #if DistC2C>= RadSmall+RadLg:
 #    print ("There is no overlap between these circles.")
