@@ -30,14 +30,12 @@ os.chdir(dataFolder)
 # given R1, R2, and D, what is Beta1 and Beta2 ?
 # given R1, R2, and D what is Aisoc1 and Aisoc2 ?
 #==============================================================================
-#Radii = [1.381976597885342,1.784124,2.185096861184158,2.111004122822376]
-#AreaOverlap = {'AO01':1,'AO12':0,'AO23':7, 'AO03':2}
-#CircleNames = ['Consumption \nIncrease,6', 'Approach \nIncrease,10', 'Consumption \nDecrease,15', 'Approach \nDecrease,14', 'No Response,15']
 
-#reorder - 1 to 0, 0 to 1, 3 to 2, 2 to 3
-Radii = [1.381976597885342,1.784124,2.185096861184158,2.111004122822376]
-AreaOverlap = {'AO01':1,'AO12':0,'AO23':7, 'AO03':2}
-CircleNames = ['Consumption \nIncrease,6', 'Approach \nIncrease,10', 'Consumption \nDecrease,15', 'Approach \nDecrease,14', 'No Response,15']
+#Set up a list of radii, a dictionary of areas of overlap, and a list of Circle names for 
+#4 circles based on the actual lab data
+Radii = [1.784124,1.381976597885342,2.111004122822376,2.185096861184158]
+AreaOverlap = {'AO01':1,'AO12':2,'AO23':7, 'AO03':0}
+CircleNames = ['Approach \nIncrease,10', 'Consumption \nIncrease,6', 'Approach \nDecrease,14', 'Consumption \nDecrease,15', 'No Response,15']
 
 def Distance_Circle_Center_to_Chord (RadiusBig,RadiusSmall,CCDist):
     """
@@ -332,23 +330,25 @@ for aKey in OverlapKeys:
             #too many overlapping circles...
             print ("The number of radii overlapping is too large... ", numOverlap)
             
+#Use previously defined Distance function to calculate the distance between circle centerpoints
 Dist01 = Calculate_Distance_for_Given_Overlap(Radii[1], Radii[0], AreaOverlap['AO01'])
-#Dist12 = Calculate_Distance_for_Given_Overlap(Radii[2], Radii[1], AreaOverlap['AO12'])
+Dist12 = Calculate_Distance_for_Given_Overlap(Radii[2], Radii[1], AreaOverlap['AO12'])
 Dist23 = Calculate_Distance_for_Given_Overlap(Radii[2], Radii[3], AreaOverlap['AO23'])
-Dist03 = Calculate_Distance_for_Given_Overlap(Radii[3], Radii[0], AreaOverlap['AO03'])
+#Dist03 = Calculate_Distance_for_Given_Overlap(Radii[3], Radii[0], AreaOverlap['AO03'])
 print (DistanceAO)
 print (Dist01)
-#print (Dist12)
+print (Dist12)
 print (Dist23)
-print (Dist03)
+#print (Dist03)
 
-angle01 = math.pi/4
-#angle12 = math.pi * 2/3
-angle23 = math.pi * 3/2
-angle03 = math.pi * 2/3
+#pick bearing angles to achieve desired figure shape
+angle01 = math.pi * 4/3
+angle12 = math.pi * 1/1
+angle23 = math.pi * 2/3
+#angle03 = math.pi * 2/3
 
 theBearings = {'AO01':angle01, 'AO12':angle12, 'AO23':angle23}
-#now get the corners
+#Now get the corners
 allCenterXs,allCenterYs,allCornersDataSet01 = find_All_Corners_in_Order_single_Overlap(Radii, DistanceAO, theBearings)
 
 print("Final answer:  ", allCenterXs, allCenterYs, allCornersDataSet01)
