@@ -342,9 +342,9 @@ print (Dist23)
 #print (Dist03)
 
 #pick bearing angles to achieve desired figure shape
-angle01 = math.pi * 4/3
-angle12 = math.pi * 1/1
-angle23 = math.pi * 2/3
+angle01 = math.pi * 7/6
+angle12 = math.pi * 5/6
+angle23 = math.pi * 1/2
 #angle03 = math.pi * 2/3
 
 theBearings = {'AO01':angle01, 'AO12':angle12, 'AO23':angle23}
@@ -360,21 +360,21 @@ circle1 = plt.Circle((allCenterXs[0],allCenterYs[0]),radius = Radii[0], color = 
 circle2 = plt.Circle((allCenterXs[1],allCenterYs[1]),radius = Radii[1], color = 'b', alpha = .3)
 circle3 = plt.Circle((allCenterXs[2],allCenterYs[2]),radius = Radii[2], color = 'r', alpha = .3)
 circle4 = plt.Circle((allCenterXs[3],allCenterYs[3]),radius = Radii[3], color = 'y', alpha = .3)
-circle5 = plt.Circle((5,2),radius = 2.185096861184158, color = 'k', alpha = .3)
+circle5 = plt.Circle((6,2),radius = 2.185096861184158, color = 'k', alpha = .3)
 plt.gca().add_patch(circle1)
 plt.gca().add_patch(circle2)
 plt.gca().add_patch(circle3)
 plt.gca().add_patch(circle4)
 plt.gca().add_patch(circle5)
 
-plt.text(allCenterXs[0], 1,CircleNames[0], horizontalalignment='center', verticalalignment='center',multialignment='center')
-plt.text(allCenterXs[1], 3,CircleNames[1], horizontalalignment='center', verticalalignment='center',multialignment='center')
-plt.text(6, 2.5,CircleNames[2], horizontalalignment='center', verticalalignment='center',multialignment='center')
-plt.text(8.5, -2,CircleNames[3], horizontalalignment='center', verticalalignment='center',multialignment='center')
-plt.text(1.5, -2,CircleNames[4], horizontalalignment='center', verticalalignment='center')
-plt.text(1.6,1.7, AreaOverlap['AO01'], color = 'red')
-plt.text(4,1.7, AreaOverlap['AO12'], color = 'red')
-plt.text(allCenterXs[3], allCenterYs[3], AreaOverlap['AO23'], color = 'red')
+plt.text(allCenterXs[0], allCenterYs[0],CircleNames[0], horizontalalignment='center', verticalalignment='center',multialignment='center')
+plt.text(allCenterXs[1], allCenterYs[1],CircleNames[1], horizontalalignment='center', verticalalignment='center',multialignment='center')
+plt.text(allCenterXs[2],allCenterYs[2],CircleNames[2], horizontalalignment='center', verticalalignment='center',multialignment='center')
+plt.text(allCenterXs[3],allCenterYs[3],CircleNames[3], horizontalalignment='center', verticalalignment='center',multialignment='center')
+plt.text(6,2,CircleNames[4], horizontalalignment='center', verticalalignment='center')
+plt.text(1,0.5, AreaOverlap['AO01'], color = 'red')
+plt.text(1,-1, AreaOverlap['AO12'], color = 'red')
+plt.text(3,-3, AreaOverlap['AO23'], color = 'red')
 
 
 plt.axis('scaled')
